@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .row{
+            display: flex;
+        }
+        .block{
+            padding: 1px;
+            background: fuchsia;
+            width:70px;
+            height: 25px;
+            display: inline-block;
+            border: 1px black solid;
+            margin: 1%;
+            /*background-image: url("flor.png");*/
+        }
+        .blocks_container{
+            margin-left: 190px;
+            
+        }
+        #paddle{
+            display:block;
+            background: red;
+            width: 150px;
+            height:40px;
+            position: absolute;
+            bottom:0;
+            left: 45vw;
+            border-radius:30px;
+        }
+         /*
+            Definimos los estilos de la pelota y
+            de la caja que la contiene
+        */
+     
+        #imagen{
+            /*Es importantisimo asignarle a la imagen una posición relativa
+              para que pueda moverse siguiendo el flujo natural del HTML es
+              decir dentro de la caja. Si le ponemos posición absoluta la bola
+              se saldrá del div, y si utilizas posición fixed la bola utilizará
+              toda la ventana del navegador para dar vueltas, por defecto la posición
+              de los elementos es estática lo que quiere decir que no pueden posicionarse
+              por encima de otros elementos sino que van uno detrás de otro.
+            */
+                position: absolute;
+                display:block;
+                width:50px;
+                height: 50px;
+            }
+     
+            #lienzo{
+                width:100%;
+                height:100vh;
+                border:1px solid gray;
+                box-shadow:0px 0px 20px gray inset;
+                border-radius:20px;
+                overflow: hidden;
+            }
+            
+     /*Animaciones CSS*/
+            .gira{
+                -moz-animation:rotar 700ms infinite linear;
+                -webkit-animation:rotar 700ms infinite linear;
+            }
+            @-moz-keyframes rotar{
+                from{
+                    -moz-transform:rotate(0deg);
+                }
+                to{
+                    -moz-transform:rotate(360deg);
+                }
+            }
+            @-webkit-keyframes rotar{
+                from{
+                    -webkit-transform:rotate(0deg);
+                }
+                to{
+                    -webkit-transform:rotate(360deg);
+                }
+            }
+
+            body{
+                overflow: hidden;
+            }
+    </style>
+</head>
+<body>
+
+        <div id="lienzo">
+            <div class="blocks_container"></div>
+            <div id="paddle">
+            </div>
+            <img src="imagen.png" id="imagen" class="gira"/>
+        </div>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function(){
+            girar();
+        });
+        var set = [
+            [{life:1},{life:1},{life:1},{life:1}],
+            [{life:1},{life:1},{life:1},{life:1}],
+            [{life:1},{life:1},{life:1},{life:1}]
+        ];
+        
+        for (let i = 0; i < 3; i++) {
+            $('.blocks_container').append("<div class='row'>");
+            for (let j = 0; j < 10; j++) {
+                $('.blocks_container .row:last-child').append("<div class='block'>");
+            }
+        }
+        $('.blocks_container').append("<div>");
+                window.onload = function(){
+			document.onkeydown = inspeccionarTecla;
+		}
+        var interval = null;
+window.onload=function(){document.onkeydown=desplazar};
+    function desplazar(objeto){
+        var tecla = objeto.which;
+        if(event.which == 37){
+            if(interval == null){
+                interval = setInterval(function (){
+                    $("#paddle").css("left","-=5");
+                    check();
+                    console.log("izquierda");
+                });
+            }
+        }
+        
+        if(event.which == 39){
+            if(interval == null){
+                interval = setInterval(function (){
+                    $("#paddle").css("left","+=5");
+                    check();
+                    console.log("DERECHA");
+                });
+            }
+        }
+        console.log(interval);
+    }
+    function check(){     
+        var bordes = document.getElementById("paddle").getBoundingClientRect();
+        var bordesLienzo = document.getElementById("lienzo").getBoundingClientRect();
+        if(bordes.left <= bordesLienzo.left){
+            clearInterval(interval);
+            $("#paddle").css("left",bordesLienzo.left);
+            interval = null;
+        }
+        console.log(bordes.right + " - "+bordesLienzo.right);
+        if(bordes.right >= bordesLienzo.right){
+            clearInterval(interval);
+            var asd = $("#lienzo").width() - $("#paddle").width() + 9;
+            console.log(asd);
+            $("#paddle").css("left", asd);
+            interval = null;
+        }
+    }
+    $(document).on("keyup", function (event){
+        if(event.which == 37 || event.which == 39){
+            clearInterval(interval);
+            interval = null;
+        }
+    });
+     
+            //Definimos las variables:
+            var y=0;           
+            var x=0;
+            var controlY=1;  
+            var controlX=1;  
+            var velocidad=1;
+     
+            // Cada 6 mili-segundos se va a ejecutar la función mover que comprueba
+                    // las colisiones de la pelota
+            var intervalo=setInterval("mover()",6);
+     
+            function mover(){
+
+
+                //Eje Y
+                if(y>=document.getElementById("lienzo").offsetHeight-50){ 
+    // Esto significa si y es mayor o igual a la altura que tiene el lienzo menos el tamaño de la imagen
+                controlY=0;
+                //y=document.getElementById("lienzo").offsetHeight-200;
+                }
+                if(controlY==1){ 
+                    y+=velocidad;
+                }else{         
+                    y-=velocidad;
+                }
+                if(y<=0){
+                    controlY=1;
+                    y=0;
+                }
+     
+                //Eje X
+                if(x>=document.getElementById("lienzo").offsetWidth-50){
+                    controlX=0;
+                    //x=document.getElementById("lienzo").offsetWidth-200;
+                }
+                if(controlX==1){ 
+                    x+=velocidad;
+                }else{         
+                    x-=velocidad;
+                }
+                if(x<=0){
+                    controlX=1;
+                    x=0;
+                }
+                document.getElementById("imagen").style.left=String(x)+"px";
+                document.getElementById("imagen").style.top=String(y)+"px";
+            }
+     
+            function girar(){
+                document.getElementById("imagen").className="gira";
+            }
+        </script>
+    
+</body>
+</html>
